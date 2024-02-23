@@ -10,6 +10,7 @@ const server = express();
 server.set("view engine", "ejs");
 server.set("views", "pages");
 server.use(express.static(path.join(__dirname, "public")));
+server.use(express.json());
 
 server.use(
     express.urlencoded({
@@ -32,7 +33,7 @@ server.post("/", async (req, res) => {
 
 server.delete("/:id", async (req, res) => {
     await deleteNoteById(req.params.id);
-    
+
     res.render("index", {
         title: "Express App",
         notes: await getNotes(),
