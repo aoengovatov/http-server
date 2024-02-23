@@ -1,7 +1,7 @@
 const express = require("express");
 const chalk = require("chalk");
 const path = require("path");
-const { addNote, getNotes, deleteNoteById } = require("./notes.controller");
+const { addNote, getNotes, deleteNoteById, editNoteById } = require("./notes.controller");
 
 const PORT = 3000;
 
@@ -33,6 +33,19 @@ server.post("/", async (req, res) => {
 
 server.delete("/:id", async (req, res) => {
     await deleteNoteById(req.params.id);
+
+    res.render("index", {
+        title: "Express App",
+        notes: await getNotes(),
+        created: false,
+    });
+});
+
+server.put("/:id", async (req, res) => {
+    const id = req.params.id;
+    const title = req.body.title;
+
+    await editNoteById(id, title);
 
     res.render("index", {
         title: "Express App",
