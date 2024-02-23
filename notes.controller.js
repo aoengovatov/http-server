@@ -47,6 +47,6 @@ async function printNotes() {
 
 module.exports = {
     addNote,
-    printNotes,
+    getNotes,
     deleteNoteById,
 };
