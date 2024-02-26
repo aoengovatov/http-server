@@ -35,21 +35,13 @@ async function deleteNoteById(id) {
 
 async function editNoteById(id, title) {
     let notes = await getNotes();
-    const notesIds = notes.map((note) => note.id);
+    const note = notes.find((note) => note.id === id);
 
-    if (notesIds.includes(id)) {
-        const newNote = {
-            id,
-            title,
-        };
+    if (!note) return console.log(chalk.bgRed("Note was not found"));
 
-        notes = notes.map((note) => (note.id === id ? newNote : note));
-
-        await fs.writeFile(notePath, JSON.stringify(notes));
-        console.log(chalk.bgGreen("Note was edited!"));
-        return;
-    }
-    console.log(chalk.bgRed("Note was not found"));
+    note.title = title;
+    await fs.writeFile(notePath, JSON.stringify(notes));
+    console.log(chalk.bgGreen("Note was edited!"));
 }
 
 async function getNotes() {
