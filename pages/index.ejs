@@ -10,9 +10,16 @@
 <body>
     <% if (created) {%>
         <div class="alert alert-success">
-            Note has been created
+            Note has been created!
         </div>
     <% } %>
+
+    <% if (error) {%>
+        <div class="alert alert-danger">
+            Somthing went wrong!
+        </div>
+    <% } %>
+
     <div class="container">
         <h1>Node Server!</h1>
 

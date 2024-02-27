@@ -1,6 +1,8 @@
 const express = require("express");
 const chalk = require("chalk");
 const path = require("path");
+const mongoose = require("mongoose");
+
 const { addNote, getNotes, deleteNoteById, editNoteById } = require("./notes.controller");
 
 const PORT = 3000;
@@ -23,12 +25,28 @@ server.get("/", async (req, res) => {
         title: "Express App",
         notes: await getNotes(),
         created: false,
+        error: false,
     });
 });
 
 server.post("/", async (req, res) => {
-    await addNote(req.body.title);
-    res.render("index", { title: "Express App", notes: await getNotes(), created: true });
+    try {
+        await addNote(req.body.title);
+        res.render("index", {
+            title: "Express App",
+            notes: await getNotes(),
+            created: true,
+            error: false,
+        });
+    } catch (e) {
+        console.error("Creation error", e);
+        res.render("index", {
+            title: "Express App",
+            notes: await getNotes(),
+            created: false,
+            error: true,
+        });
+    }
 });
 
 server.delete("/:id", async (req, res) => {
@@ -38,6 +56,7 @@ server.delete("/:id", async (req, res) => {
         title: "Express App",
         notes: await getNotes(),
         created: false,
+        error: false,
     });
 });
 
@@ -51,9 +70,16 @@ server.put("/:id", async (req, res) => {
         title: "Express App",
         notes: await getNotes(),
         created: false,
+        error: false,
     });
 });
 
-server.listen(PORT, () => {
-    console.log(chalk.green(`Server has been started on port ${PORT}`));
-});
+mongoose
+    .connect(
+        "mongodb+srv://aoengovatov:<password>@cluster0.ndz6eui.mongodb.net/notes?retryWrites=true&w=majority&appName=Cluster0"
+    )
+    .then(() => {
+        server.listen(PORT, () => {
+            console.log(chalk.green(`Server has been started on port ${PORT}`));
+        });
+    });
