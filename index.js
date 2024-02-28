@@ -4,6 +4,7 @@ const path = require("path");
 const mongoose = require("mongoose");
 
 const { addNote, getNotes, deleteNoteById, editNoteById } = require("./notes.controller");
+const { addUser } = require("./user.controller");
 
 const PORT = 3000;
 
@@ -25,6 +26,34 @@ server.get("/", async (req, res) => {
         title: "Express App",
         notes: await getNotes(),
         created: false,
+        error: false,
+    });
+});
+
+server.post("/register", async (req, res) => {
+    try {
+        await addUser(req.body.email, req.body.password);
+        res.redirect("/login");
+    } catch (e) {
+        console.log(e);
+        if (e.code === 11000) {
+            res.render("register", {
+                title: "Express App",
+                error: "Email is already register",
+            });
+            return;
+        }
+
+        res.render("register", {
+            title: "Express App",
+            error: e.message,
+        });
+    }
+});
+
+server.get("/register", async (req, res) => {
+    res.render("register", {
+        title: "Express App",
         error: false,
     });
 });
