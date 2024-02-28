@@ -2,9 +2,10 @@ const express = require("express");
 const chalk = require("chalk");
 const path = require("path");
 const mongoose = require("mongoose");
+const cookieParser = require("cookie-parser");
 
 const { addNote, getNotes, deleteNoteById, editNoteById } = require("./notes.controller");
-const { addUser } = require("./user.controller");
+const { addUser, loginUser } = require("./user.controller");
 
 const PORT = 3000;
 
@@ -14,6 +15,7 @@ server.set("view engine", "ejs");
 server.set("views", "pages");
 server.use(express.static(path.join(__dirname, "public")));
 server.use(express.json());
+server.use(cookieParser());
 
 server.use(
     express.urlencoded({
@@ -45,6 +47,27 @@ server.post("/register", async (req, res) => {
         }
 
         res.render("register", {
+            title: "Express App",
+            error: e.message,
+        });
+    }
+});
+
+server.get("/login", async (req, res) => {
+    res.render("login", {
+        title: "Express App",
+        error: false,
+    });
+});
+
+server.post("/login", async (req, res) => {
+    try {
+        const token = await loginUser(req.body.email, req.body.password);
+
+        res.cookie("token", token);
+        res.redirect("/");
+    } catch (e) {
+        res.render("login", {
             title: "Express App",
             error: e.message,
         });
