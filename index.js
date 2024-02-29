@@ -79,6 +79,7 @@ server.get("/", async (req, res) => {
     res.render("index", {
         title: "Express App",
         notes: await getNotes(),
+        userEmail: req.user.email,
         created: false,
         error: false,
     });
@@ -86,10 +87,11 @@ server.get("/", async (req, res) => {
 
 server.post("/", async (req, res) => {
     try {
-        await addNote(req.body.title);
+        await addNote(req.body.title, req.user.email);
         res.render("index", {
             title: "Express App",
             notes: await getNotes(),
+            userEmail: req.user.email,
             created: true,
             error: false,
         });
@@ -98,6 +100,8 @@ server.post("/", async (req, res) => {
         res.render("index", {
             title: "Express App",
             notes: await getNotes(),
+            userEmail: req.user.email,
+            userEmail: req.user.email,
             created: false,
             error: true,
         });
@@ -105,33 +109,53 @@ server.post("/", async (req, res) => {
 });
 
 server.delete("/:id", async (req, res) => {
-    await deleteNoteById(req.params.id);
+    try {
+        await deleteNoteById(req.params.id);
 
-    res.render("index", {
-        title: "Express App",
-        notes: await getNotes(),
-        created: false,
-        error: false,
-    });
+        res.render("index", {
+            title: "Express App",
+            notes: await getNotes(),
+            userEmail: req.user.email,
+            created: false,
+            error: false,
+        });
+    } catch (e) {
+        res.render("index", {
+            title: "Express App",
+            notes: await getNotes(),
+            userEmail: req.user.email,
+            created: false,
+            error: e.message,
+        });
+    }
 });
 
 server.put("/:id", async (req, res) => {
-    const id = req.params.id;
-    const title = req.body.title;
+    try {
+    } catch (e) {
+        const id = req.params.id;
+        const title = req.body.title;
 
-    await editNoteById(id, title);
+        await editNoteById(id, title);
+        res.render("index", {
+            title: "Express App",
+            notes: await getNotes(),
+            created: false,
+            error: false,
+        });
+    }
 
     res.render("index", {
         title: "Express App",
         notes: await getNotes(),
         created: false,
-        error: false,
+        error: e.message,
     });
 });
 
 mongoose
     .connect(
-        "mongodb+srv://aoengovatov:<password>>@cluster0.ndz6eui.mongodb.net/notes?retryWrites=true&w=majority&appName=Cluster0"
+        "mongodb+srv://aoengovatov:aoengovatovadmin@cluster0.ndz6eui.mongodb.net/notes?retryWrites=true&w=majority&appName=Cluster0"
     )
     .then(() => {
         server.listen(PORT, () => {

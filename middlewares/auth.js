@@ -6,11 +6,15 @@ function auth(req, res, next) {
 
     try {
         const verifyResult = jwt.verify(token, JWT_SECRET);
+
+        req.user = {
+            email: verifyResult.email,
+        };
+        
         next();
     } catch (e) {
         res.redirect("/login");
     }
-
 }
 
 module.exports = auth;

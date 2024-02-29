@@ -5,6 +5,10 @@ const noteShema = mongoose.Schema({
         type: String,
         required: true,
     },
+    owner: {
+        type: String,
+        required: true,
+    },
 });
 
 const note = mongoose.model("note", noteShema);
