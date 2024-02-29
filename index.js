@@ -35,7 +35,7 @@ server.post("/login", async (req, res) => {
     try {
         const token = await loginUser(req.body.email, req.body.password);
 
-        res.cookie("token", token);
+        res.cookie("token", token, { httpOnly: true });
         res.redirect("/");
     } catch (e) {
         res.render("login", {
@@ -71,6 +71,11 @@ server.get("/register", async (req, res) => {
         title: "Express App",
         error: false,
     });
+});
+
+server.get("/logout", (req, res) => {
+    res.cookie("token", "", { httpOnly: true });
+    req.redirect("/login");
 });
 
 server.use(auth);
