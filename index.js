@@ -3,6 +3,7 @@ const chalk = require("chalk");
 const path = require("path");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
+const auth = require("./middlewares/auth");
 
 const { addNote, getNotes, deleteNoteById, editNoteById } = require("./notes.controller");
 const { addUser, loginUser } = require("./user.controller");
@@ -19,17 +20,29 @@ server.use(cookieParser());
 
 server.use(
     express.urlencoded({
-        extanded: true,
+        extended: true,
     })
 );
 
-server.get("/", async (req, res) => {
-    res.render("index", {
+server.get("/login", async (req, res) => {
+    res.render("login", {
         title: "Express App",
-        notes: await getNotes(),
-        created: false,
         error: false,
     });
+});
+
+server.post("/login", async (req, res) => {
+    try {
+        const token = await loginUser(req.body.email, req.body.password);
+
+        res.cookie("token", token);
+        res.redirect("/");
+    } catch (e) {
+        res.render("login", {
+            title: "Express App",
+            error: e.message,
+        });
+    }
 });
 
 server.post("/register", async (req, res) => {
@@ -53,30 +66,20 @@ server.post("/register", async (req, res) => {
     }
 });
 
-server.get("/login", async (req, res) => {
-    res.render("login", {
+server.get("/register", async (req, res) => {
+    res.render("register", {
         title: "Express App",
         error: false,
     });
 });
 
-server.post("/login", async (req, res) => {
-    try {
-        const token = await loginUser(req.body.email, req.body.password);
+server.use(auth);
 
-        res.cookie("token", token);
-        res.redirect("/");
-    } catch (e) {
-        res.render("login", {
-            title: "Express App",
-            error: e.message,
-        });
-    }
-});
-
-server.get("/register", async (req, res) => {
-    res.render("register", {
+server.get("/", async (req, res) => {
+    res.render("index", {
         title: "Express App",
+        notes: await getNotes(),
+        created: false,
         error: false,
     });
 });
@@ -128,7 +131,7 @@ server.put("/:id", async (req, res) => {
 
 mongoose
     .connect(
-        "mongodb+srv://aoengovatov:<password>@cluster0.ndz6eui.mongodb.net/notes?retryWrites=true&w=majority&appName=Cluster0"
+        "mongodb+srv://aoengovatov:<password>>@cluster0.ndz6eui.mongodb.net/notes?retryWrites=true&w=majority&appName=Cluster0"
     )
     .then(() => {
         server.listen(PORT, () => {
